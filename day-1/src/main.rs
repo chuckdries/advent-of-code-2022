@@ -31,6 +31,8 @@ fn main() {
 
     println!("highest calories: {max_sum}");
 
+    println!("sums: {max_sum} {second_sum} {third_sum}");
+
     let top_three = max_sum + second_sum + third_sum;
 
     println!("top three calories: {}", top_three);
