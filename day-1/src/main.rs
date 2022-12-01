@@ -6,7 +6,7 @@ fn main() {
     let file = File::open("input.txt").unwrap();
     let reader = BufReader::new(file);
 
-    let (one, two, three, _) = reader
+    let (max_sum, second_sum, third_sum, _) = reader
         .lines()
         .fold((0, 0, 0, 0), |(max_sum, second_sum, third_sum, current), wrapped| {
             let line = wrapped.unwrap();
@@ -24,9 +24,9 @@ fn main() {
             }
         });
 
-    println!("highest calories: {one}");
+    println!("highest calories: {max_sum}");
 
-    let top_three = one + two + three;
+    let top_three = max_sum + second_sum + third_sum;
 
     println!("top three calories: {}", top_three);
 }
