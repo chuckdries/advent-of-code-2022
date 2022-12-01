@@ -32,11 +32,14 @@ fn main() {
 
     elves.sort_by_key(|e| e.calories);
 
-    let mut top_three = 0;
 
-    top_three += elves.pop().unwrap().calories;
-    top_three += elves.pop().unwrap().calories;
-    top_three += elves.pop().unwrap().calories;
+    let max = elves.pop().unwrap().calories;
+    let second = elves.pop().unwrap().calories;
+    let third = elves.pop().unwrap().calories;
+
+    println!("sums {max} {second} {third}");
+    
+    let top_three = max + second + third;
 
     println!("top three calories: {}", top_three);
 
