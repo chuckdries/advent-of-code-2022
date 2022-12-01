@@ -11,9 +11,9 @@ fn main() {
             let line = wrapped.unwrap();
             if line == "" {
                 if current > max_sum {
-                    return (current, second_sum, third_sum, 0);
+                    return (current, max_sum, second_sum, 0);
                 } else if current > second_sum {
-                    return (max_sum, current, third_sum, 0);
+                    return (max_sum, current, second_sum, 0);
                 } else if current > third_sum {
                     return (max_sum, second_sum, current, 0);
                 }
