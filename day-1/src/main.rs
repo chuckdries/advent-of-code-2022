@@ -1,46 +1,39 @@
 use std::fs::File;
-use std::io::{self, prelude::*, BufReader};
-
-#[derive(Debug)]
-struct Elf {
-    calories: usize,
-    index: usize,
-}
+use std::io::{prelude::*, BufReader};
 
 fn main() {
-    let mut elves: Vec<Elf> = Vec::new();
-
     let file = File::open("input.txt").unwrap();
     let reader = BufReader::new(file);
 
-    let mut highest_calories = 0;
-    let mut calories = 0;
-    for (i, line_wrapped) in reader.lines().enumerate() {
-        let line = line_wrapped.unwrap();
-        if line == "" {
-            elves.push(Elf { calories, index: i });
-            if calories > highest_calories {
-                highest_calories = calories;
+    let (max_sum, second_sum, third_sum, _) = reader.lines().fold(
+        (0, 0, 0, 0),
+        |(max_sum, second_sum, third_sum, current), wrapped| {
+            let line = wrapped.unwrap();
+            if line == "" {
+                if current > max_sum {
+                    return (current, max_sum, second_sum, 0);
+                } else if current > second_sum {
+                    return (max_sum, current, second_sum, 0);
+                } else if current > third_sum {
+                    return (max_sum, second_sum, current, 0);
+                }
+                (max_sum, second_sum, third_sum, 0)
+            } else {
+                (
+                    max_sum,
+                    second_sum,
+                    third_sum,
+                    current + line.parse::<usize>().unwrap(),
+                )
             }
-            calories = 0;
-        } else {
-            calories += line.parse::<usize>().unwrap();
-        }
-    }
+        },
+    );
 
-    println!("highest calories: {}", highest_calories);
+    println!("highest calories: {max_sum}");
 
-    elves.sort_by_key(|e| e.calories);
+    println!("sums: {max_sum} {second_sum} {third_sum}");
 
-
-    let max = elves.pop().unwrap().calories;
-    let second = elves.pop().unwrap().calories;
-    let third = elves.pop().unwrap().calories;
-
-    println!("sums {max} {second} {third}");
-    
-    let top_three = max + second + third;
+    let top_three = max_sum + second_sum + third_sum;
 
     println!("top three calories: {}", top_three);
-
 }
