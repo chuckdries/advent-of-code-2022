@@ -66,7 +66,8 @@ fn part_two(reader: &mut BufReader<File>) {
             Elf::Three => {
                 third_elf = line.chars().collect();
 
-                let first_two_set: HashSet<&char> = HashSet::from(first_elf.intersection(&second_elf).collect::<HashSet<&char>>());
+                let first_two_intersection = first_elf.intersection(&second_elf);
+                let first_two_set: HashSet<&char> = first_two_intersection.collect();
                 third_elf.retain(|e| first_two_set.contains(e));
                 let badge = third_elf.iter().next().unwrap();
 
