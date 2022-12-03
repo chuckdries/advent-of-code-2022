@@ -43,9 +43,49 @@ fn part_one(reader: BufReader<File>) {
             }
         }
     }
-    println!("sum: {sum}")
+    println!("part one sum: {sum}")
+}
+
+fn part_two(reader: BufReader<File>) {
+    let mut sum: usize = 0;
+    let mut elf_index: usize = 0;
+    let mut first_elf: HashSet<char> = HashSet::new();
+    let mut second_elf: HashSet<char> = HashSet::new();
+    for wrapped in reader.lines() {
+        let line = wrapped.unwrap();
+        print!("{elf_index} - ");
+        let chars: Vec<char> = line.chars().collect();
+        for char in chars {
+            if elf_index == 0 {
+                print!("{char}");
+                first_elf.insert(char);
+            } else if elf_index == 1 {
+                if first_elf.contains(&char) {
+                    print!("{char}");
+                    second_elf.insert(char);
+                }
+            } else {
+                if second_elf.contains(&char) {
+                    sum += get_char_priority(char) as usize;
+                    println!("badge is {char}");
+                    break;
+                }
+            }
+        }
+        println!("");
+        if elf_index < 2 {
+            elf_index += 1;
+        } else {
+            // reset index and duplication sets
+            elf_index = 0;
+            first_elf = HashSet::new();
+            second_elf = HashSet::new();
+        }
+    }
+    println!("part two sum: {sum}")
 }
 
 fn main() {
+    part_two(get_reader());
     part_one(get_reader());
 }
