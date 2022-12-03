@@ -4,12 +4,6 @@ use std::{
     io::{BufRead, BufReader, Seek},
 };
 
-fn get_reader() -> BufReader<File> {
-    let file = File::open("input.txt").unwrap();
-    let reader = BufReader::new(file);
-    reader
-}
-
 // map from rust char u8 values to problem values
 // a-z: 97-122 -> 1-16
 // A-Z: 65-90 -> 27-52
@@ -86,7 +80,9 @@ fn part_two(reader: &mut BufReader<File>) {
 }
 
 fn main() {
-    let mut reader = get_reader();
+    let file = File::open("input.txt").unwrap();
+    let mut reader = BufReader::new(file);
+
     part_two(&mut reader);
     reader.rewind().unwrap();
     part_one(&mut reader);
