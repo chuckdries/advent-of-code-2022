@@ -48,8 +48,7 @@ fn part_two(reader: &mut BufReader<File>) {
     for wrapped in reader.lines() {
         let line = wrapped.unwrap();
         print!("{elf_index} - ");
-        let chars: Vec<char> = line.chars().collect();
-        for char in chars {
+        for char in line.chars() {
             if elf_index == 0 {
                 print!("{char}");
                 first_elf.insert(char);
