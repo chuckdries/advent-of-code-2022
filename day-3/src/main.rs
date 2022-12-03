@@ -40,39 +40,39 @@ fn part_one(reader: &mut BufReader<File>) {
     println!("part one sum: {sum}")
 }
 
+enum Elf {
+    One,
+    Two,
+    Three
+}
+
 fn part_two(reader: &mut BufReader<File>) {
     let mut sum: usize = 0;
-    let mut elf_index: usize = 0;
+    let mut elf_index = Elf::One;
     let mut first_elf: HashSet<char> = HashSet::new();
     let mut second_elf: HashSet<char> = HashSet::new();
+    let mut third_elf: HashSet<char> = HashSet::new();
     for wrapped in reader.lines() {
         let line = wrapped.unwrap();
-        print!("{elf_index} - ");
-        for char in line.chars() {
-            if elf_index == 0 {
-                print!("{char}");
-                first_elf.insert(char);
-            } else if elf_index == 1 {
-                if first_elf.contains(&char) {
-                    print!("{char}");
-                    second_elf.insert(char);
-                }
-            } else {
-                if second_elf.contains(&char) {
-                    sum += get_char_priority(char) as usize;
-                    println!("badge is {char}");
-                    break;
-                }
+        match elf_index {
+            Elf::One => {
+                first_elf = line.chars().collect();
+                elf_index = Elf::Two;
+            },
+            Elf::Two => {
+                second_elf = line.chars().collect();
+                elf_index = Elf::Three;
+            },
+            Elf::Three => {
+                third_elf = line.chars().collect();
+
+                let first_two_set: HashSet<&char> = HashSet::from(first_elf.intersection(&second_elf).collect::<HashSet<&char>>());
+                third_elf.retain(|e| first_two_set.contains(e));
+                let badge = third_elf.iter().next().unwrap();
+
+                sum += get_char_priority(*badge) as usize;
+                elf_index = Elf::One;
             }
-        }
-        println!("");
-        if elf_index < 2 {
-            elf_index += 1;
-        } else {
-            // reset index and duplication sets
-            elf_index = 0;
-            first_elf = HashSet::new();
-            second_elf = HashSet::new();
         }
     }
     println!("part two sum: {sum}")
