@@ -1,7 +1,7 @@
 use std::{
     collections::HashSet,
     fs::File,
-    io::{BufRead, BufReader},
+    io::{BufRead, BufReader, Seek},
 };
 
 fn get_reader() -> BufReader<File> {
@@ -24,7 +24,7 @@ fn get_char_priority(char: char) -> u8 {
     }
 }
 
-fn part_one(reader: BufReader<File>) {
+fn part_one(reader: &mut BufReader<File>) {
     let mut sum: usize = 0;
     for wrapped in reader.lines() {
         let line = wrapped.unwrap();
@@ -46,7 +46,7 @@ fn part_one(reader: BufReader<File>) {
     println!("part one sum: {sum}")
 }
 
-fn part_two(reader: BufReader<File>) {
+fn part_two(reader: &mut BufReader<File>) {
     let mut sum: usize = 0;
     let mut elf_index: usize = 0;
     let mut first_elf: HashSet<char> = HashSet::new();
@@ -86,6 +86,8 @@ fn part_two(reader: BufReader<File>) {
 }
 
 fn main() {
-    part_two(get_reader());
-    part_one(get_reader());
+    let mut reader = get_reader();
+    part_two(&mut reader);
+    reader.rewind().unwrap();
+    part_one(&mut reader);
 }
