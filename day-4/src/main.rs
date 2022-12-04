@@ -4,15 +4,15 @@ use std::{
 };
 
 struct Range {
-    high: usize,
-    low: usize,
+    high: isize,
+    low: isize,
 }
 
 impl Range {
     pub fn new(range_str: &str) -> Range {
         let mut split = range_str.split("-");
-        let low: usize = split.next().unwrap().parse().unwrap();
-        let high: usize = split.next().unwrap().parse().unwrap();
+        let low: isize = split.next().unwrap().parse().unwrap();
+        let high: isize = split.next().unwrap().parse().unwrap();
         Range {
             low,
             high
@@ -24,8 +24,8 @@ fn elves_overlap_entirely(one: &Range, two: &Range) -> bool {
     (one.high >= two.high && one.low <= two.low) || (two.high >= one.high && two.low <= one.low)
 }
 
-fn part_one(reader: &mut BufReader<File>) {
-    let mut overlapping_groups: usize = 0;
+fn part_one(reader: &mut BufReader<File>) -> isize{
+    let mut overlapping_groups: isize = 0;
     for wrapped in reader.lines() {
         let line = wrapped.unwrap();
         let mut split = line.split(",");
@@ -36,17 +36,15 @@ fn part_one(reader: &mut BufReader<File>) {
         }
     }
     println!("overlapping groups part 1 {overlapping_groups}");
+    overlapping_groups
 }
 
 fn elves_overlap_at_all(one: &Range, two: &Range) -> bool {
-    (one.high >= two.low && one.high <= two.high) ||
-    (one.low >= two.low && one.low <= two.high) ||
-    (two.high >= one.low && two.high <= one.high) ||
-    (two.low >= one.low && two.low <= one.high)
+    two.low - one.high <= 0
 }
 
-fn part_two(reader: &mut BufReader<File>) {
-    let mut overlapping_groups: usize = 0;
+fn part_two(reader: &mut BufReader<File>) -> isize {
+    let mut overlapping_groups: isize = 0;
     for wrapped in reader.lines() {
         let line = wrapped.unwrap();
         let mut split = line.split(",");
@@ -59,13 +57,19 @@ fn part_two(reader: &mut BufReader<File>) {
         }
     }
     println!("overlapping groups part 2 {overlapping_groups}");
+    overlapping_groups
 }
 
 fn main() {
     let file = File::open("input.txt").unwrap();
     let mut reader = BufReader::new(file);
 
-    part_one(&mut reader);
+    let p1 = part_one(&mut reader);
     reader.rewind().unwrap();
-    part_two(&mut reader);
+
+    let p2 = part_two(&mut reader);
+
+    // check for correct answer
+    assert_eq!(p1, 305);
+    assert_eq!(p2, 811);
 }
