@@ -24,7 +24,7 @@ fn elves_overlap_entirely(one: &Range, two: &Range) -> bool {
     (one.high >= two.high && one.low <= two.low) || (two.high >= one.high && two.low <= one.low)
 }
 
-fn part_one(reader: &mut BufReader<File>) {
+fn part_one(reader: &mut BufReader<File>) -> usize {
     let mut overlapping_groups: usize = 0;
     for wrapped in reader.lines() {
         let line = wrapped.unwrap();
@@ -36,6 +36,7 @@ fn part_one(reader: &mut BufReader<File>) {
         }
     }
     println!("overlapping groups part 1 {overlapping_groups}");
+    overlapping_groups
 }
 
 fn elves_overlap_at_all(one: &Range, two: &Range) -> bool {
@@ -45,7 +46,7 @@ fn elves_overlap_at_all(one: &Range, two: &Range) -> bool {
     (two.low >= one.low && two.low <= one.high)
 }
 
-fn part_two(reader: &mut BufReader<File>) {
+fn part_two(reader: &mut BufReader<File>) -> usize{
     let mut overlapping_groups: usize = 0;
     for wrapped in reader.lines() {
         let line = wrapped.unwrap();
@@ -59,13 +60,19 @@ fn part_two(reader: &mut BufReader<File>) {
         }
     }
     println!("overlapping groups part 2 {overlapping_groups}");
+    overlapping_groups
 }
 
 fn main() {
     let file = File::open("input.txt").unwrap();
     let mut reader = BufReader::new(file);
 
-    part_one(&mut reader);
+    let p1 = part_one(&mut reader);
     reader.rewind().unwrap();
-    part_two(&mut reader);
+
+    let p2 = part_two(&mut reader);
+
+    // check for correct answer
+    assert_eq!(p1, 305);
+    assert_eq!(p2, 811);
 }
