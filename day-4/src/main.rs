@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{BufRead, BufReader},
+    io::{BufRead, BufReader, Seek},
 };
 
 struct Range {
@@ -11,8 +11,8 @@ struct Range {
 impl Range {
     pub fn new(range_str: &str) -> Range {
         let mut split = range_str.split("-");
-        let low: usize = split.next().unwrap().parse().expect("input numbers must be integers");
-        let high: usize = split.next().unwrap().parse().expect("input numbers must be integers");
+        let low: usize = split.next().unwrap().parse().unwrap();
+        let high: usize = split.next().unwrap().parse().unwrap();
         Range {
             low,
             high
@@ -35,7 +35,30 @@ fn part_one(reader: &mut BufReader<File>) {
             overlapping_groups += 1;
         }
     }
-    println!("overlapping groups {overlapping_groups}");
+    println!("overlapping groups part 1 {overlapping_groups}");
+}
+
+fn elves_overlap_at_all(one: &Range, two: &Range) -> bool {
+    (one.high >= two.low && one.high <= two.high) ||
+    (one.low >= two.low && one.low <= two.high) ||
+    (two.high >= one.low && two.high <= one.high) ||
+    (two.low >= one.low && two.low <= one.high)
+}
+
+fn part_two(reader: &mut BufReader<File>) {
+    let mut overlapping_groups: usize = 0;
+    for wrapped in reader.lines() {
+        let line = wrapped.unwrap();
+        let mut split = line.split(",");
+
+        let elf_one = Range::new(split.next().unwrap());
+        let elf_two = Range::new(split.next().unwrap());
+
+        if elves_overlap_at_all(&elf_one, &elf_two) {
+            overlapping_groups += 1;
+        }
+    }
+    println!("overlapping groups part 2 {overlapping_groups}");
 }
 
 fn main() {
@@ -43,4 +66,6 @@ fn main() {
     let mut reader = BufReader::new(file);
 
     part_one(&mut reader);
+    reader.rewind().unwrap();
+    part_two(&mut reader);
 }
