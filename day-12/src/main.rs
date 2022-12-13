@@ -4,7 +4,7 @@ use std::{
 };
 
 use grid::Grid;
-use pathfinding::prelude::bfs;
+use pathfinding::prelude::dijkstra;
 
 type Coord = (usize, usize);
 
@@ -14,6 +14,8 @@ fn main() {
 
     assert_eq!(true, valid_step('a', 'b'));
     assert_eq!(false, valid_step('a', 'c'));
+    assert_eq!(true, valid_step('S', 'b'));
+    assert_eq!(true, valid_step('E', 'y'));
 
     let one_result = part_one(&mut reader);
     println!("part one: {one_result}");
@@ -40,7 +42,7 @@ fn valid_step(_curr: char, _next: char) -> bool {
 fn get_successors(grid: &mut Grid<char>, pos: Coord) -> Vec<Coord> {
     let mut successors: Vec<Coord> = Vec::new();
     let (width, height) = grid.size();
-    let char = grid.get(pos.0, pos.1).unwrap();    
+    let char = grid.get(pos.0, pos.1).unwrap();
     // right
     if pos.0 + 1 < width {
         let right_step = (pos.0 + 1, pos.1);
@@ -97,10 +99,10 @@ fn part_one(reader: &mut BufReader<File>) -> usize {
     }
     println!("start at {:?}, end at {:?}", pos_start, pos_end);
 
-    let result = bfs(
+    let result = dijkstra(
         &pos_start,
-        |pos| get_successors(&mut grid, *pos),
+        |pos| get_successors(&mut grid, *pos).into_iter().map(|p| (p, 1)),
         |p| *p == pos_end,
     );
-    result.expect("couldn't find path to end").len()
+    result.expect("couldn't find path to end").1
 }
