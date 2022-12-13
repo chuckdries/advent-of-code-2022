@@ -1,10 +1,10 @@
 use std::{
-    collections::HashSet,
     fs::File,
     io::{BufRead, BufReader, Seek},
 };
 
 use grid::Grid;
+use pathfinding::prelude::bfs;
 
 type Coord = (usize, usize);
 
@@ -12,77 +12,71 @@ fn main() {
     let file = File::open("input.txt").unwrap();
     let mut reader = BufReader::new(file);
 
-    let one_result = part_one(&mut reader);
-    println!("one: {one_result}");
     assert_eq!(true, valid_step('a', 'b'));
     assert_eq!(false, valid_step('a', 'c'));
+
+    let one_result = part_one(&mut reader);
+    println!("part one: {one_result}");
+    reader.rewind().unwrap();
 }
 
-fn valid_step(_prev: char, _current: char) -> bool {
-    let current = match _current {
+fn valid_step(_curr: char, _next: char) -> bool {
+    let curr = match _curr {
         'S' => 'a',
         'E' => 'z',
-        _ => _current,
+        _ => _curr,
     };
 
-    let prev = match _prev {
+    let next = match _next {
         'S' => 'a',
         'E' => 'z',
-        _ => _prev,
+        _ => _next,
     };
 
-    let distance: isize = prev as isize - current as isize;
+    let distance: isize = curr as isize - next as isize;
     distance.abs() <= 1
 }
 
-// @returns bool - whether or not it found the end
-fn step(
-    grid: &Grid<char>,
-    visited: &mut HashSet<Coord>,
-    target: Coord,
-    pos: Coord,
-    previous_char: &char,
-) -> isize {
-    let char = grid.get(pos.0, pos.1).unwrap();
-    if !valid_step(*previous_char, *char) {
-        return 0;
-    }
-
-    visited.insert(pos);
-
-    if pos == target {
-        return 1;
-    }
-
+fn get_successors(grid: &mut Grid<char>, pos: Coord) -> Vec<Coord> {
+    let mut successors: Vec<Coord> = Vec::new();
     let (width, height) = grid.size();
+    let char = grid.get(pos.0, pos.1).unwrap();    
     // right
-    let right_coord = (pos.0 + 1, pos.1);
-    let right = if right_coord.0 < width && !visited.contains(&right_coord) {
-        step(grid, visited, target, right_coord, char)
-    } else {
-        0
-    };
-    let down_coord = (pos.0, pos.1 + 1);
-    let down = if down_coord.1 < height && !visited.contains(&down_coord) {
-        step(grid, visited, target, down_coord, char)
-    } else {
-        0
-    };
-    let left = if pos.0 as isize - 1 > 0 && !visited.contains(&(pos.0 - 1, pos.1)) {
-        step(grid, visited, target, (pos.0 - 1, pos.1), char)
-    } else {
-        0
-    };
-
-    let up = if pos.1 as isize - 1 > 0 && !visited.contains(&(pos.0, pos.1 - 1)) {
-        step(grid, visited, target, (pos.0, pos.1 - 1), char)
-    } else {
-        0
-    };
-    (right + down + left + up) + (right * down * left * up * 1)
+    if pos.0 + 1 < width {
+        let right_step = (pos.0 + 1, pos.1);
+        let next_char = grid.get(right_step.0, right_step.1).unwrap();
+        if valid_step(*char, *next_char) {
+            successors.push(right_step)
+        }
+    }
+    // down
+    if pos.1 + 1 < height {
+        let down_step = (pos.0, pos.1 + 1);
+        let next_char = grid.get(down_step.0, down_step.1).unwrap();
+        if valid_step(*char, *next_char) {
+            successors.push(down_step);
+        }
+    }
+    // left
+    if pos.0 > 0 {
+        let left_step = (pos.0 - 1, pos.1);
+        let next_char = grid.get(left_step.0, left_step.1).unwrap();
+        if valid_step(*char, *next_char) {
+            successors.push(left_step);
+        }
+    }
+    // up
+    if pos.1 > 0 {
+        let up_step = (pos.0, pos.1 - 1);
+        let next_char = grid.get(up_step.0, up_step.1).unwrap();
+        if valid_step(*char, *next_char) {
+            successors.push(up_step);
+        }
+    }
+    successors
 }
 
-fn part_one(reader: &mut BufReader<File>) -> isize {
+fn part_one(reader: &mut BufReader<File>) -> usize {
     let mut grid: Grid<char> = Grid::new(0, 0);
     let mut pos_start: Coord = (0, 0);
     let mut pos_end: Coord = (0, 0);
@@ -103,6 +97,10 @@ fn part_one(reader: &mut BufReader<File>) -> isize {
     }
     println!("start at {:?}, end at {:?}", pos_start, pos_end);
 
-    let mut visited: HashSet<Coord> = HashSet::new();
-    step(&grid, &mut visited, pos_end, pos_start, &'S')
+    let result = bfs(
+        &pos_start,
+        |pos| get_successors(&mut grid, *pos),
+        |p| *p == pos_end,
+    );
+    result.expect("couldn't find path to end").len()
 }
