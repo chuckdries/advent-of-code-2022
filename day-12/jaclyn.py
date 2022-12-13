@@ -4,10 +4,10 @@ heights = {char: i for i, char in enumerate(string.ascii_lowercase)}
 heights.update({"S": 0, "E": 25})
 
 def BFSearch(graph, start, end):
-    visited_vertices = []
+    visited_vertices = set()
     queue = []
 
-    visited_vertices.append(start)
+    visited_vertices.add(start)
     queue.append((start,0))
 
     while queue:
@@ -21,7 +21,7 @@ def BFSearch(graph, start, end):
         for v in graph[n]:
             if v not in visited_vertices:
                 queue.append((v,depth+1))
-                visited_vertices.append(v)
+                visited_vertices.add(v)
     return float("inf")
 
 def check_weight(point1, point2):
