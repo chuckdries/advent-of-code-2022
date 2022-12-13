@@ -4,7 +4,7 @@ use std::{
 };
 
 use grid::Grid;
-use pathfinding::prelude::dijkstra;
+use pathfinding::prelude::{dijkstra, bfs};
 
 type Coord = (usize, usize);
 
@@ -14,6 +14,7 @@ fn main() {
 
     assert_eq!(true, valid_step('a', 'b'));
     assert_eq!(false, valid_step('a', 'c'));
+    assert_eq!(true, valid_step('c', 'a'));
     assert_eq!(true, valid_step('S', 'b'));
     assert_eq!(true, valid_step('E', 'y'));
 
@@ -35,8 +36,8 @@ fn valid_step(_curr: char, _next: char) -> bool {
         _ => _next,
     };
 
-    let distance: isize = curr as isize - next as isize;
-    distance.abs() <= 1
+    let distance = next as isize - curr as isize;
+    distance <= 1
 }
 
 fn get_successors(grid: &mut Grid<char>, pos: Coord) -> Vec<Coord> {
