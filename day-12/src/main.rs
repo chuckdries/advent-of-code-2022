@@ -4,7 +4,7 @@ use std::{
 };
 
 use grid::Grid;
-use pathfinding::prelude::{dijkstra, bfs};
+use pathfinding::prelude::{bfs, dijkstra};
 
 type Coord = (usize, usize);
 
@@ -20,7 +20,10 @@ fn main() {
 
     let one_result = part_one(&mut reader);
     println!("part one: {one_result}");
+
     reader.rewind().unwrap();
+    let two_result = part_two(&mut reader);
+    println!("part two: {two_result}");
 }
 
 fn valid_step(_curr: char, _next: char) -> bool {
@@ -106,4 +109,39 @@ fn part_one(reader: &mut BufReader<File>) -> usize {
         |p| *p == pos_end,
     );
     result.expect("couldn't find path to end").1
+}
+
+fn part_two(reader: &mut BufReader<File>) -> usize {
+    let mut grid: Grid<char> = Grid::new(0, 0);
+    let mut starting_coords: Vec<Coord> = Vec::new();
+    let mut pos_end: Coord = (0, 0);
+    for (i, wrapped) in reader.lines().enumerate() {
+        let line = wrapped.unwrap();
+        let chars = line.chars();
+        let mut row: Vec<char> = Vec::new();
+        for (j, char) in chars.enumerate() {
+            if char == 'S' || char == 'a' {
+                starting_coords.push((i, j));
+            }
+            if char == 'E' {
+                pos_end = (i, j);
+            }
+            row.push(char);
+        }
+        grid.push_row(row);
+    }
+    println!("start at ?, end at {:?}", pos_end);
+
+    let result = starting_coords
+        .into_iter()
+        .filter_map(|coord| {
+            dijkstra(
+                &coord,
+                |pos| get_successors(&mut grid, *pos).into_iter().map(|p| (p, 1)),
+                |p| *p == pos_end,
+            )
+        })
+        .map(|q| q.1)
+        .min();
+    result.unwrap()
 }
