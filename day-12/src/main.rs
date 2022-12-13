@@ -5,7 +5,7 @@ use std::{
 };
 
 use grid::Grid;
-use pathfinding::prelude::{dijkstra};
+use pathfinding::prelude::bfs;
 
 type Coord = (usize, usize);
 
@@ -107,12 +107,12 @@ fn part_one(reader: &mut BufReader<File>) -> usize {
         grid.push_row(row);
     }
 
-    let result = dijkstra(
+    let result = bfs(
         &pos_start,
-        |pos| get_successors(&mut grid, *pos).into_iter().map(|p| (p, 1)),
+        |pos| get_successors(&mut grid, *pos),
         |p| *p == pos_end,
     );
-    result.expect("couldn't find path to end").1
+    result.expect("couldn't find path to end").len() - 1
 }
 
 fn part_two(reader: &mut BufReader<File>) -> usize {
@@ -138,13 +138,13 @@ fn part_two(reader: &mut BufReader<File>) -> usize {
     let result = starting_coords
         .into_iter()
         .filter_map(|coord| {
-            dijkstra(
+            bfs(
                 &coord,
-                |pos| get_successors(&mut grid, *pos).into_iter().map(|p| (p, 1)),
+                |pos| get_successors(&mut grid, *pos),
                 |p| *p == pos_end,
             )
         })
-        .map(|q| q.1)
+        .map(|q| q.len())
         .min();
-    result.unwrap()
+    result.unwrap() - 1
 }
