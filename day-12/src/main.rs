@@ -1,10 +1,11 @@
 use std::{
     fs::File,
     io::{BufRead, BufReader, Seek},
+    time::Instant,
 };
 
 use grid::Grid;
-use pathfinding::prelude::{bfs, dijkstra};
+use pathfinding::prelude::{dijkstra};
 
 type Coord = (usize, usize);
 
@@ -18,12 +19,16 @@ fn main() {
     assert_eq!(true, valid_step('S', 'b'));
     assert_eq!(true, valid_step('E', 'y'));
 
+    let now = Instant::now();
     let one_result = part_one(&mut reader);
-    println!("part one: {one_result}");
+    let elapsed = now.elapsed();
+    println!("part one: {one_result} (took {:.2?})", elapsed);
 
     reader.rewind().unwrap();
+    let now = Instant::now();
     let two_result = part_two(&mut reader);
-    println!("part two: {two_result}");
+    let elapsed = now.elapsed();
+    println!("part two: {two_result} (took {:.2?})", elapsed);
 }
 
 fn valid_step(_curr: char, _next: char) -> bool {
@@ -101,7 +106,6 @@ fn part_one(reader: &mut BufReader<File>) -> usize {
         }
         grid.push_row(row);
     }
-    println!("start at {:?}, end at {:?}", pos_start, pos_end);
 
     let result = dijkstra(
         &pos_start,
@@ -130,7 +134,6 @@ fn part_two(reader: &mut BufReader<File>) -> usize {
         }
         grid.push_row(row);
     }
-    println!("start at ?, end at {:?}", pos_end);
 
     let result = starting_coords
         .into_iter()
